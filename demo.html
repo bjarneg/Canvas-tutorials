@@ -18,6 +18,7 @@
 	<br><button class="ballpath type">Ball path</button>
 	<br><button class="ballplayer type">Player with ball</button>
 	<br><button class="eraser type">eraser</button>
+	<br><button class="undo type">Undo</button>
 </div>
 </div>
 <script>
@@ -25,7 +26,7 @@
 var thisShape = null;
 var playerpath_noball_start_x = 0;
 var playerpath_noball_start_y = 0;;
-
+var thisCanvas;
 init();
 
 jQuery(function(){
@@ -33,6 +34,11 @@ jQuery(function(){
 	jQuery(".type").click(function(e){
 
 		thisShape = jQuery(this).attr("class").replace(" type","");
+		console.log(thisShape)
+		if (thisShape === "undo")
+		{
+			undo();
+		}
 
 	});
 

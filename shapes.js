@@ -175,7 +175,11 @@ CanvasState.prototype.removeShape = function(shape, sel) {
   }
 }
 
-
+CanvasState.prototype.undo = function()
+{
+  // this.valid = false;
+  // this.shapes.pop();        
+}
 
 CanvasState.prototype.clear = function() {
   this.ctx.clearRect(0, 0, this.width, this.height);
@@ -190,17 +194,7 @@ CanvasState.prototype.draw = function() {
     var shapes = this.shapes;
     this.clear();
     
-    var l = this.remove_shapes.length;
-    for (var i = 0; i < l; i++) {
-      var shape = this.remove_shapes[i];
-      // We can skip the drawing of elements that have moved off the screen:
-      if (shape.x > this.width || shape.y > this.height ||
-          shape.x + shape.w < 0 || shape.y + shape.h < 0) continue;
-        
-          this.remove_shapes[i].remove(ctx);  
-        
-        
-    }
+    console.log(shapes);
 
     // ** Add stuff you want drawn in the background all the time here **
     
@@ -242,6 +236,28 @@ CanvasState.prototype.draw = function() {
         // else if (mySel.type == "ballplayerpath")
         // {
           this.removeShape(undefined, mySel); 
+        // }
+      }
+      else if (thisShape === "undo")
+      {
+        // if (mySel.type === "ball")
+        // {
+        //   this.removeShape(new ShapeBall(mySel.x, mySel.y), mySel);
+        // }
+        // else if (mySel.type === "cone")
+        // {
+        //   this.removeShape(new ShapeTriangle(mySel.x, mySel.y), mySel);
+        // }
+        // else if (mySel.type === "ballplayer")
+        // {
+        //   this.removeShape(new ShapeBallPlayer(mySel.x, mySel.y), mySel);
+        // }
+        // else if (mySel.type == "ballplayerpath")
+        // {
+          
+             
+            // this.undo();
+       
         // }
       }
       else
@@ -294,6 +310,7 @@ CanvasState.prototype.getMouse = function(e) {
 
 function init() {
   var s = new CanvasState(document.getElementById('canvas1'));
+  thisCanvas = s;
   // s.addShape(new Shape(40,40,50,50)); // The default is gray
   // s.addShape(new Shape(60,140,40,60, 'lightskyblue'));
   // // Lets make some partially transparent
@@ -301,3 +318,18 @@ function init() {
   // s.addShape(new Shape(125,80,30,80, 'rgba(245, 222, 179, .7)'));
 }
 
+
+function undo() {
+  
+  // s.addShape(new Shape(40,40,50,50)); // The default is gray
+  // s.addShape(new Shape(60,140,40,60, 'lightskyblue'));
+  // // Lets make some partially transparent
+  // s.addShape(new Shape(80,150,60,30, 'rgba(127, 255, 212, .5)'));
+  // s.addShape(new Shape(125,80,30,80, 'rgba(245, 222, 179, .7)'))
+  if (thisShape === "undo")
+  {
+    console.log(thisCanvas)
+    thisCanvas.valid = false;
+    thisCanvas.shapes.pop();
+  }
+}
