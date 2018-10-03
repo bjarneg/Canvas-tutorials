@@ -1,0 +1,42 @@
+<html>
+<body>
+<script   src="https://code.jquery.com/jquery-3.3.1.min.js"   integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="   crossorigin="anonymous"></script>
+<script src="shape_triangle.js"></script>
+<script src="shape_rectangle.js"></script>
+<script src="shape_ball.js"></script>
+<script src="shape_ballplayer.js"></script>
+<script src="ShapePlayerPathNoBall.js"></script>
+<script src="shapes.js"></script>
+<div>
+<div style="width:601px;float:left;margin:0 10px 0 0;">
+	<canvas id="canvas1" style="border: 1px solid black;background: #567d46;" width="600" height="800"></canvas>
+</div>
+<div style="width:201px;float:left;height:800px">
+	<button class="cone type">cone</button>
+	<br><button class="ball type">ball</button>
+	<br><button class="playerpath_noball type">Player path w/o ball</button>
+	<br><button class="ballpath type">Ball path</button>
+	<br><button class="ballplayer type">Player with ball</button>
+	<br><button class="eraser type">eraser</button>
+</div>
+</div>
+<script>
+
+var thisShape = null;
+var playerpath_noball_start_x = 0;
+var playerpath_noball_start_y = 0;;
+
+init();
+
+jQuery(function(){
+
+	jQuery(".type").click(function(e){
+
+		thisShape = jQuery(this).attr("class").replace(" type","");
+
+	});
+
+});
+</script>
+</body>
+</html>

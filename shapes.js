@@ -7,36 +7,11 @@
 // Free to use and distribute at will
 // So long as you are nice to people, etc
 
-// Constructor for Shape objects to hold data for all drawn objects.
-// For now they will just be defined as rectangles.
-function Shape(x, y, w, h, fill) {
-  // This is a very simple and unsafe constructor. All we're doing is checking if the values exist.
-  // "x || 0" just means "if there is a value for x, use that. Otherwise use 0."
-  // But we aren't checking anything else! We could put "Lalala" for the value of x 
-  this.x = x || 0;
-  this.y = y || 0;
-  this.w = w || 1;
-  this.h = h || 1;
-  this.fill = fill || '#AAAAAA';
-}
 
-// Draws this shape to a given context
-Shape.prototype.draw = function(ctx) {
-  ctx.fillStyle = this.fill;
-  ctx.fillRect(this.x, this.y, this.w, this.h);
-}
-
-// Determine if a point is inside the shape's bounds
-Shape.prototype.contains = function(mx, my) {
-  // All we have to do is make sure the Mouse X,Y fall in the area between
-  // the shape's X and (X + Width) and its Y and (Y + Height)
-  return  (this.x <= mx) && (this.x + this.w >= mx) &&
-          (this.y <= my) && (this.y + this.h >= my);
-}
 
 function CanvasState(canvas) {
   // **** First some setup! ****
-  
+  //console.log(canvas);
   this.canvas = canvas;
   this.width = canvas.width;
   this.height = canvas.height;
@@ -60,6 +35,7 @@ function CanvasState(canvas) {
   
   this.valid = false; // when set to false, the canvas will redraw everything
   this.shapes = [];  // the collection of things to be drawn
+  this.remove_shapes = [];
   this.dragging = false; // Keep track of when we are dragging
   // the current selected object. In the future we could turn this into an array for multiple selection
   this.selection = null;
@@ -120,7 +96,54 @@ function CanvasState(canvas) {
   // double click for making new shapes
   canvas.addEventListener('dblclick', function(e) {
     var mouse = myState.getMouse(e);
-    myState.addShape(new Shape(mouse.x - 10, mouse.y - 10, 20, 20, 'rgba(0,255,0,.6)'));
+   // myState.addShape(new Shape(mouse.x - 10, mouse.y - 10, 20, 20, 'rgba(0,255,0,.6)'));
+    //myState.addShape(new ShapeTriangle(mouse.x - 10, mouse.y - 10, 20, 20, 'rgba(0,255,0,.6)'));
+    if (thisShape !== null)
+    {
+
+        if (thisShape === "cone")
+        {
+          myState.addShape(new ShapeTriangle(mouse.x-10 , mouse.y-10, "rgba(255,255,255,1)"));
+        }
+        else if (thisShape === "ball")
+        {
+          myState.addShape(new ShapeBall(mouse.x-10 , mouse.y-10, "rgba(255,255,255,1)"));
+        }
+        else if (thisShape === "ballplayer")
+        {
+          myState.addShape(new ShapeBallPlayer(mouse.x-10 , mouse.y-10, "rgba(255,255,255,1)"));
+        }
+        else if (thisShape == "playerpath_noball")
+        {
+          if (playerpath_noball_start_x === 0)
+          {
+            playerpath_noball_start_x = mouse.x;
+            playerpath_noball_start_y = mouse.y;
+          }
+          else
+          {
+            myState.addShape(new ShapePlayerPath(playerpath_noball_start_x, playerpath_noball_start_y, mouse.x, mouse.y, "rgba(255,255,255,1)",false,false));
+            playerpath_noball_start_x = 0;
+            playerpath_noball_start_y = 0;
+          }
+        }
+        else if (thisShape == "ballpath")
+        {
+          if (playerpath_noball_start_x === 0)
+          {
+            playerpath_noball_start_x = mouse.x;
+            playerpath_noball_start_y = mouse.y;
+          }
+          else
+          {
+            myState.addShape(new ShapePlayerPath(playerpath_noball_start_x, playerpath_noball_start_y, mouse.x, mouse.y, "rgba(255,255,255,1)",true,false));
+            playerpath_noball_start_x = 0;
+            playerpath_noball_start_y = 0;
+          }
+        }
+       
+    }
+    
   }, true);
   
   // **** Options! ****
@@ -136,6 +159,23 @@ CanvasState.prototype.addShape = function(shape) {
   this.valid = false;
 }
 
+
+CanvasState.prototype.removeShape = function(shape, sel) {
+  //this.remove_shapes.push(shape);
+  this.valid = false;
+  var shapes = this.shapes;
+  var l = shapes.length;
+  for (var i = 0; i < l; i++) {
+    var zhape = shapes[i];
+    if (zhape == sel)
+    {
+      this.shapes.splice(i,1);
+    }
+  }
+}
+
+
+
 CanvasState.prototype.clear = function() {
   this.ctx.clearRect(0, 0, this.width, this.height);
 }
@@ -149,6 +189,18 @@ CanvasState.prototype.draw = function() {
     var shapes = this.shapes;
     this.clear();
     
+    var l = this.remove_shapes.length;
+    for (var i = 0; i < l; i++) {
+      var shape = this.remove_shapes[i];
+      // We can skip the drawing of elements that have moved off the screen:
+      if (shape.x > this.width || shape.y > this.height ||
+          shape.x + shape.w < 0 || shape.y + shape.h < 0) continue;
+        
+          this.remove_shapes[i].remove(ctx);  
+        
+        
+    }
+
     // ** Add stuff you want drawn in the background all the time here **
     
     // draw all shapes
@@ -161,13 +213,42 @@ CanvasState.prototype.draw = function() {
       shapes[i].draw(ctx);
     }
     
+   
+
+
     // draw selection
     // right now this is just a stroke along the edge of the selected Shape
     if (this.selection != null) {
-      ctx.strokeStyle = this.selectionColor;
-      ctx.lineWidth = this.selectionWidth;
+
+      // ctx.strokeStyle = this.selectionColor;
+      // ctx.lineWidth = this.selectionWidth;
       var mySel = this.selection;
-      ctx.strokeRect(mySel.x,mySel.y,mySel.w,mySel.h);
+      
+      if (thisShape === "eraser")
+      {
+        if (mySel.type === "ball")
+        {
+          this.removeShape(new ShapeBall(mySel.x, mySel.y), mySel);
+        }
+        else if (mySel.type === "cone")
+        {
+          this.removeShape(new ShapeTriangle(mySel.x, mySel.y), mySel);
+        }
+        else if (mySel.type === "ballplayer")
+        {
+          this.removeShape(new ShapeBallPlayer(mySel.x, mySel.y), mySel);
+        }
+      }
+      else
+      {
+         if (mySel.type === "cone")
+        {
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#666666';
+            ctx.stroke();  
+        }
+      }
+      //ctx.strokeRect(mySel.x,mySel.y,mySel.w,mySel.h);
     }
     
     // ** Add stuff you want drawn on top all the time here **
@@ -208,11 +289,10 @@ CanvasState.prototype.getMouse = function(e) {
 
 function init() {
   var s = new CanvasState(document.getElementById('canvas1'));
-  s.addShape(new Shape(40,40,50,50)); // The default is gray
-  s.addShape(new Shape(60,140,40,60, 'lightskyblue'));
-  // Lets make some partially transparent
-  s.addShape(new Shape(80,150,60,30, 'rgba(127, 255, 212, .5)'));
-  s.addShape(new Shape(125,80,30,80, 'rgba(245, 222, 179, .7)'));
+  // s.addShape(new Shape(40,40,50,50)); // The default is gray
+  // s.addShape(new Shape(60,140,40,60, 'lightskyblue'));
+  // // Lets make some partially transparent
+  // s.addShape(new Shape(80,150,60,30, 'rgba(127, 255, 212, .5)'));
+  // s.addShape(new Shape(125,80,30,80, 'rgba(245, 222, 179, .7)'));
 }
 
-// Now go make something amazing!
