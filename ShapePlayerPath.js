@@ -64,7 +64,7 @@ ShapePlayerPath.prototype.contains = function(mx, my) {
   // All we have to do is make sure the Mouse X,Y fall in the area between
   // the shape's X and (X + Width) and its Y and (Y + Height)
   
-  return (((mx >= (this.x-10)) && (mx <= (this.x+10))) && ((my >= (this.y-20)) && (my <= (this.y+20))))
+  return (((mx >= (this.startx)) && (mx <= (this.stopx))) && ((my >= (this.starty)) && (my <= (this.stopy))))
   
 
 }

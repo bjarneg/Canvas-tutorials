@@ -163,6 +163,7 @@ CanvasState.prototype.addShape = function(shape) {
 CanvasState.prototype.removeShape = function(shape, sel) {
   //this.remove_shapes.push(shape);
   this.valid = false;
+  console.log(sel);
   var shapes = this.shapes;
   var l = shapes.length;
   for (var i = 0; i < l; i++) {
@@ -226,18 +227,22 @@ CanvasState.prototype.draw = function() {
       
       if (thisShape === "eraser")
       {
-        if (mySel.type === "ball")
-        {
-          this.removeShape(new ShapeBall(mySel.x, mySel.y), mySel);
-        }
-        else if (mySel.type === "cone")
-        {
-          this.removeShape(new ShapeTriangle(mySel.x, mySel.y), mySel);
-        }
-        else if (mySel.type === "ballplayer")
-        {
-          this.removeShape(new ShapeBallPlayer(mySel.x, mySel.y), mySel);
-        }
+        // if (mySel.type === "ball")
+        // {
+        //   this.removeShape(new ShapeBall(mySel.x, mySel.y), mySel);
+        // }
+        // else if (mySel.type === "cone")
+        // {
+        //   this.removeShape(new ShapeTriangle(mySel.x, mySel.y), mySel);
+        // }
+        // else if (mySel.type === "ballplayer")
+        // {
+        //   this.removeShape(new ShapeBallPlayer(mySel.x, mySel.y), mySel);
+        // }
+        // else if (mySel.type == "ballplayerpath")
+        // {
+          this.removeShape(undefined, mySel); 
+        // }
       }
       else
       {
